@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Soothe Healthcare</string>
+    <string name="go">GO</string>
+    <string name="cancel">Cancel</string>
+    <!--    <string name="version">Version : 2024.01.17</string>-->
+    <!--    <string name="version">Version : 2024.02.23</string>-->
+    <string name="version">Version : 2025.12.17</string>
+    <string name="ok">OK</string>
+    <string name="pass">$V$9Y$&amp;5E$&amp;Z</string>
+    <string name="delivery">Delivery :</string>
+    <string name="components">Components:</string>
+    <string name="issue_for_production">Issue for Production</string>
+    <string name="issue_inventory">Inventory Transfer Request</string>
+    <string name="return_from_production">Return from Production</string>
+    <string name="receipt_production">Receipt Production</string>
+    <string name="are_you_sure_you_want_to_logout">Are you sure you want to logout?</string>
+    <string name="logout">Logout</string>
+    <string name="title_activity_delivery_one">DeliveryOneActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="title_activity_demo">DemoActivity</string>
+    <string name="sale_delivery">SO To Delivery</string>
+    <string name="so_doc">SO Document No.</string>
+    <string name="delivery_order">Delivery Order</string>
+</resources>
