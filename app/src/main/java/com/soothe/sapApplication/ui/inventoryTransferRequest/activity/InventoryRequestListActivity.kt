@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.GsonBuilder
 import com.pixplicity.easyprefs.library.Prefs
@@ -77,7 +79,7 @@ class InventoryRequestListActivity : AppCompatActivity() {
                 materialProgressDialog.show()
                 val apiConfig = ApiConstantForURL()
                 NetworkClients.updateBaseUrlFromConfig(apiConfig, ApiConstantForURL.ApiType.CUSTOM)
-                val networkClient =NetworkClients.create(this)
+                val networkClient = NetworkClients.create(this)
                 val savedBPLID = Prefs.getString(AppConstants.BPLID, "")
                 val currentApi =
                     if (isOldDevelopment) networkClient.doGetRequestListCount(
@@ -105,14 +107,15 @@ class InventoryRequestListActivity : AppCompatActivity() {
                                         Toast.LENGTH_SHORT,
                                     )
                                     if (!productionList_gl.isNullOrEmpty() && productionList_gl.size > 0) {
-
+                                        binding.tvNoDataFound.visibility = View.GONE
+                                        binding.rvItrRequest.visibility = View.VISIBLE
                                         requestListModel_gl.addAll(productionList_gl)
 
                                         setRequestListAdapter(requestListModel_gl)
-
                                         requestAdapter?.notifyDataSetChanged()
-
-
+                                    } else {
+                                        binding.tvNoDataFound.visibility = View.VISIBLE
+                                        binding.rvItrRequest.visibility = View.GONE
                                     }
 
                                 } else {
@@ -147,10 +150,11 @@ class InventoryRequestListActivity : AppCompatActivity() {
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
-                            }catch (e: IOException) {
+                            } catch (e: IOException) {
                                 if (e.message == "VPN_Exception") {
                                     // notify UI
-                                    GlobalMethods.showError(this@InventoryRequestListActivity,"VPN is not connected. Please connect VPN and try again."
+                                    GlobalMethods.showError(
+                                        this@InventoryRequestListActivity, "VPN is not connected. Please connect VPN and try again."
                                     )
                                 }
                             }
@@ -159,9 +163,10 @@ class InventoryRequestListActivity : AppCompatActivity() {
                         override fun onFailure(call: Call<InventoryRequestModel>, t: Throwable) {
                             Log.e("issueCard_failure-----", t.toString())
                             if (t.message == "VPN_Exception") {
-                                GlobalMethods.showError(this@InventoryRequestListActivity,"VPN is not connected. Please connect VPN and try again."
+                                GlobalMethods.showError(
+                                    this@InventoryRequestListActivity, "VPN is not connected. Please connect VPN and try again."
                                 )
-                            }else{
+                            } else {
                                 GlobalMethods.showError(this@InventoryRequestListActivity, t.message ?: "")
                             }
                             materialProgressDialog.dismiss()

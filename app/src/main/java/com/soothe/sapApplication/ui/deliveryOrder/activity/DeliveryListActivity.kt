@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -90,14 +91,16 @@ class DeliveryListActivity : AppCompatActivity() {
                                         Toast.LENGTH_SHORT,
                                     )
                                     if (!productionList_gl.isNullOrEmpty() && productionList_gl.size > 0) {
-
+                                        binding.tvNoDataFound.visibility = View.GONE
+                                        binding.rvDelivery.visibility = View.VISIBLE
                                         deliveryListModel.addAll(productionList_gl)
 
                                         setDeliveryListAdapter(deliveryListModel)
 
                                         orderAdapter?.notifyDataSetChanged()
-
-
+                                    } else {
+                                        binding.tvNoDataFound.visibility = View.VISIBLE
+                                        binding.rvDelivery.visibility = View.GONE
                                     }
 
                                 } else {
@@ -138,9 +141,10 @@ class DeliveryListActivity : AppCompatActivity() {
                         override fun onFailure(call: Call<InvoiceListModel>, t: Throwable) {
                             Log.e("issueCard_failure-----", t.toString())
                             if (t.message == "VPN_Exception") {
-                                GlobalMethods.showError(this@DeliveryListActivity,"VPN is not connected. Please connect VPN and try again."
+                                GlobalMethods.showError(
+                                    this@DeliveryListActivity, "VPN is not connected. Please connect VPN and try again."
                                 )
-                            }else{
+                            } else {
                                 GlobalMethods.showError(this@DeliveryListActivity, t.message ?: "")
                             }
                             materialProgressDialog.dismiss()

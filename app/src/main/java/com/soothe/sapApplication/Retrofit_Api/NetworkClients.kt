@@ -7,6 +7,7 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import com.soothe.sapApplication.Global_Classes.AppConstants.isVpnRequired
 import com.soothe.sapApplication.Global_Classes.MyApp
 import com.soothe.sapApplication.SessionManagement.SessionManagement
 import com.soothe.sapApplication.ui.login.LoginActivity
@@ -40,11 +41,20 @@ object NetworkClients {
 
     // Utility to build a fresh OkHttpClient.Builder each time
     private fun newOkHttpBuilder(): OkHttpClient.Builder {
-        return OkHttpClient.Builder()
+        val builder = OkHttpClient.Builder()
             .connectTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
             .readTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
             .writeTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
-            .addIfAbsent(VpnCheckInterceptor(MyApp.currentApp!!.applicationContext))
+
+        if (isVpnRequired) {
+            builder.addIfAbsent(
+                VpnCheckInterceptor(
+                    MyApp.currentApp!!.applicationContext
+                )
+            )
+        }
+
+        return builder
     }
 
     // Extension function to avoid duplicate interceptors

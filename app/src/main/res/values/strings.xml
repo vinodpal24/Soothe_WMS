@@ -2,9 +2,8 @@
     <string name="app_name">Soothe Healthcare</string>
     <string name="go">GO</string>
     <string name="cancel">Cancel</string>
-    <!--    <string name="version">Version : 2024.01.17</string>-->
-    <!--    <string name="version">Version : 2024.02.23</string>-->
-    <string name="version">Version : 2025.12.17</string>
+    <!--<string name="version">Version: 1.0.0_19.12.2025</string>-->
+    <string name="version">Version: 1.0.0_31.12.2025</string>
     <string name="ok">OK</string>
     <string name="pass">$V$9Y$&amp;5E$&amp;Z</string>
     <string name="delivery">Delivery :</string>

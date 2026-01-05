@@ -187,6 +187,7 @@ if(networkConnection.getConnectivityStatusBoolean(applicationContext)){
     postedJson.addProperty("PayToCode", saleOrderValue.PayToCode)
     postedJson.addProperty("ShipToCode", saleOrderValue.ShipToCode)
     postedJson.addProperty("U_WMSUSER", sessionManagement.getLoginId(this@SalesOrderDocumentLinesActivity))
+    postedJson.addProperty("U_Scanned", "Y")
 
     var StockTransferLines = JsonArray()
 
@@ -196,9 +197,9 @@ if(networkConnection.getConnectivityStatusBoolean(applicationContext)){
         val jsonObject = JsonObject()
         jsonObject.addProperty("BaseEntry", list[i].DocEntry)
         jsonObject.addProperty("LineNum", list[i].LineNum)
-        jsonObject.addProperty("Price", list[i].Price)
+        //jsonObject.addProperty("Price", list[i].Price)
         jsonObject.addProperty("Quantity", list[i].totalPktQty)
-        jsonObject.addProperty("UnitPrice", list[i].UnitPrice)
+        //jsonObject.addProperty("UnitPrice", list[i].UnitPrice)
         jsonObject.addProperty("U_ACT_QTY", list[i].U_ACT_QTY)
         jsonObject.addProperty("U_BOX_QTY", list[i].isScanned)
         jsonObject.addProperty("ItemCode", list[i].ItemCode)

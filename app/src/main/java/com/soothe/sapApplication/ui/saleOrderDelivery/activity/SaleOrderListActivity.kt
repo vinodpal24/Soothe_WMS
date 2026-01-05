@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -93,14 +94,17 @@ class SaleOrderListActivity : AppCompatActivity() {
                                         Toast.LENGTH_SHORT,
                                     )
                                     if (!productionList_gl.isNullOrEmpty() && productionList_gl.size > 0) {
-
+                                        binding.tvNoDataFound.visibility = View.GONE
+                                        binding.rvSaleOrders.visibility = View.VISIBLE
                                         salesOrderListModel.addAll(productionList_gl)
 
                                         setSalesOrderListAdapter(salesOrderListModel)
 
                                         salesOrderAdapter?.notifyDataSetChanged()
 
-
+                                    }else {
+                                        binding.tvNoDataFound.visibility = View.VISIBLE
+                                        binding.rvSaleOrders.visibility = View.GONE
                                     }
 
                                 } else {

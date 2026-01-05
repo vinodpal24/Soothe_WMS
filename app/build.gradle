@@ -8,14 +8,15 @@ plugins {
 android {
     namespace 'com.soothe.sapApplication'
     compileSdk 34
-
+    def isDevelopment = project.hasProperty("isDevelopment") ? project.isDevelopment.toBoolean() : false
+    def testVersionName = project.hasProperty("testVersionName") ? project.testVersionName : "1.0.0"
+    def liveVersionName = project.hasProperty("liveVersionName") ? project.liveVersionName : "1.0.0"
     defaultConfig {
         applicationId "com.soothe.sapApplication"
         minSdk 21
         targetSdk 34
-        versionCode 2
-        versionName "1.0.2"
-
+        versionCode 1
+        versionName = isDevelopment ? testVersionName : liveVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,6 +26,31 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable true
+            def appName = "soothe_wms"
+
+            def date = new Date().format("dd.MM.yyyy") // Current date
+
+            // Set custom APK name and version based on environment
+            def apkVersion = isDevelopment ? "${appName}_v${testVersionName}_${date}.apk" : "${appName}_v${liveVersionName}_${date}.apk"
+            def appVersion = "V:- ${isDevelopment ? "$testVersionName $date" : "$liveVersionName $date"}"
+
+            // Rename APK file
+            applicationVariants.all { variant ->
+                variant.outputs.all { output ->
+                    if (output instanceof com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
+                        output.outputFileName = apkVersion
+                    }
+                }
+            }
+
+            // Pass the flag to BuildConfig
+            buildConfigField("boolean", "IS_DEVELOPMENT", isDevelopment.toString())
+            buildConfigField("String", "FORCED_VERSION_NAME", "\"$appVersion\"")
         }
     }
     compileOptions {

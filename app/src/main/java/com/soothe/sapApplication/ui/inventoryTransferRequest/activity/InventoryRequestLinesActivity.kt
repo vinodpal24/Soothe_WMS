@@ -188,6 +188,7 @@ class InventoryRequestLinesActivity : AppCompatActivity() {
         postedJson.addProperty("ShipToCode", inventoryItem.ShipToCode)
         postedJson.addProperty("U_DOCTYP", inventoryItem.U_DOCTYP)
         postedJson.addProperty("U_TRNTYP", inventoryItem.U_TRNTYP)
+        postedJson.addProperty("U_Scanned", "Y")
 
 
         if (networkConnection.getConnectivityStatusBoolean(applicationContext)) {
@@ -202,9 +203,9 @@ class InventoryRequestLinesActivity : AppCompatActivity() {
                 jsonObject.addProperty("FromWarehouseCode", list[i].FromWarehouseCode)
                 /*jsonObject.addProperty("ItemCode",list[i].ItemCode)
                 jsonObject.addProperty("ItemDescription",list[i].ItemDescription)*/
-                jsonObject.addProperty("Price", list[i].Price)
+                //jsonObject.addProperty("Price", list[i].Price)
                 jsonObject.addProperty("Quantity", list[i].totalPktQty)
-                jsonObject.addProperty("UnitPrice", list[i].UnitPrice)
+                //jsonObject.addProperty("UnitPrice", list[i].UnitPrice)
                 jsonObject.addProperty("U_ACT_QTY", list[i].U_ACT_QTY)
                 jsonObject.addProperty("U_BOX_QTY", list[i].isScanned)
                 jsonObject.addProperty("WarehouseCode", list[i].WarehouseCode)

@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.pixplicity.easyprefs.library.Prefs
 import com.soothe.sapApplication.Adapter.HomeAdapter
+import com.soothe.sapApplication.BuildConfig
 import com.soothe.sapApplication.Global_Classes.AppConstants
 import com.soothe.sapApplication.Global_Classes.GlobalMethods
 import com.soothe.sapApplication.Global_Classes.MaterialProgressDialog
@@ -147,7 +148,7 @@ class HomeDashboardActivity : AppCompatActivity() {
         setHomeItemAdapter(filterItems)
 
         binding.apply {
-            tvAppVersion.text = getString(R.string.version)
+            tvAppVersion.text = BuildConfig.FORCED_VERSION_NAME //getString(R.string.version)
             tvDBName.text = "DB : ${sessionManagement.getCompanyDB(this@HomeDashboardActivity)}"
         }
     }

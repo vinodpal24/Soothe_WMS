@@ -23,7 +23,7 @@
                 android:id="@+id/tvAppVersion"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.4"
+                android:layout_weight="0.5"
                 android:textSize="@dimen/text_size_12"
                 android:text="@string/version"
                 android:textColor="@color/black"
@@ -34,13 +34,12 @@
                 android:id="@+id/tvDBName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.6"
+                android:layout_weight="0.5"
                 android:paddingEnd="@dimen/size_10"
                 android:textSize="@dimen/text_size_12"
                 android:text="DB: "
                 android:gravity="end"
                 android:textColor="@color/black"
-                android:layout_marginStart="10dp"
                 android:textStyle="bold"/>
         </LinearLayout>
 
