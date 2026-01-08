@@ -13,9 +13,11 @@ import com.soothe.sapApplication.R
 import com.soothe.sapApplication.databinding.RvItemSecondaryLinesBinding
 import com.soothe.sapApplication.ui.issueForProductionOrder.Model.InventoryRequestModel
 
-class InventoryTransferRequestLinesItemAdapter(private val onSave: (
-    ArrayList<InventoryRequestModel.StockTransferLines>
-) -> Unit) :
+class InventoryTransferRequestLinesItemAdapter(
+    private val onSave: (
+        ArrayList<InventoryRequestModel.StockTransferLines>
+    ) -> Unit
+) :
     ListAdapter<InventoryRequestModel.StockTransferLines,
             InventoryTransferRequestLinesItemAdapter.ViewHolder>(DiffCallback()) {
 
@@ -88,9 +90,13 @@ class InventoryTransferRequestLinesItemAdapter(private val onSave: (
             return
         }
 
+
         val item = newList[index]
 
-        if (item.totalPktQty >= toWholeInt(item.RemainingOpenQuantity)) return
+        if (item.totalPktQty >= toWholeInt(item.RemainingOpenQuantity)) {
+            GlobalMethods.showError(MyApp.currentApp, "Scanning completed for this Item.")
+            return
+        }
 
         val newScanCount = item.isScanned + 1
 

@@ -1,6 +1,7 @@
 package com.soothe.sapApplication.ui.saleOrderDelivery.activity
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -16,6 +17,7 @@ import com.soothe.sapApplication.Global_Classes.GlobalMethods
 import com.soothe.sapApplication.Global_Classes.MaterialProgressDialog
 import com.soothe.sapApplication.Global_Notification.NetworkConnection
 import com.soothe.sapApplication.Model.OtpErrorModel
+import com.soothe.sapApplication.R
 import com.soothe.sapApplication.Retrofit_Api.ApiConstantForURL
 import com.soothe.sapApplication.Retrofit_Api.NetworkClients
 import com.soothe.sapApplication.SessionManagement.SessionManagement
@@ -32,8 +34,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class SalesOrderDocumentLinesActivity : AppCompatActivity() {
-    private lateinit var binding:ActivitySalesOrderDocumentLinesBinding
-
+    private lateinit var binding: ActivitySalesOrderDocumentLinesBinding
+    private lateinit var mediaPlayer: MediaPlayer
     private lateinit var networkConnection: NetworkConnection
     private lateinit var materialProgressDialog: MaterialProgressDialog
     private lateinit var sessionManagement: SessionManagement
@@ -41,7 +43,7 @@ class SalesOrderDocumentLinesActivity : AppCompatActivity() {
     private lateinit var soDocumentLinesList: ArrayList<SaleOrdersModel.Value.DocumentLine>
     private var saleOrderValue: SaleOrdersModel.Value? = null
 
-    private lateinit var salesOrderDocLinesAdapter:SalesOrderDocumentLinesItemAdapter
+    private lateinit var salesOrderDocLinesAdapter: SalesOrderDocumentLinesItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +84,21 @@ class SalesOrderDocumentLinesActivity : AppCompatActivity() {
                 Toast.makeText(this@SalesOrderDocumentLinesActivity, e.localizedMessage ?: "Something went wrong", Toast.LENGTH_SHORT).show()
             }
 
+        }
+    }
+
+    private fun playSound() {
+        if (::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
+        }
+        mediaPlayer = MediaPlayer.create(this, R.raw.boxx_added)
+        mediaPlayer.start()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
         }
     }
 
@@ -133,7 +150,8 @@ class SalesOrderDocumentLinesActivity : AppCompatActivity() {
                     val res = response.body()!!.value[0]
 
                     Log.i("NAV_CODE_SCANNING", "Scanning Data: $res")
-
+                    //GlobalMethods.showSuccess(this@SalesOrderDocumentLinesActivity,"Box added.")
+                    playSound()
                     salesOrderDocLinesAdapter.updateScannedItem(
                         itemCode = res.ItemCode,
                         packQty = res.U_PACK_QTY.toInt(),
@@ -146,18 +164,20 @@ class SalesOrderDocumentLinesActivity : AppCompatActivity() {
                 override fun onFailure(call: Call<NavScanResModel>, t: Throwable) {
                     materialProgressDialog.dismiss()
                     if (t.message == "VPN_Exception") {
-                        GlobalMethods.showError(this@SalesOrderDocumentLinesActivity,"VPN is not connected. Please connect VPN and try again."
+                        GlobalMethods.showError(
+                            this@SalesOrderDocumentLinesActivity, "VPN is not connected. Please connect VPN and try again."
                         )
-                    }else{
+                    } else {
                         GlobalMethods.showError(this@SalesOrderDocumentLinesActivity, t.message ?: "")
-                    }                }
+                    }
+                }
             })
     }
 
     private fun setLinesItemAdapter() {
         binding.rvSaleOrderDocLines.apply {
             layoutManager = LinearLayoutManager(this@SalesOrderDocumentLinesActivity, LinearLayoutManager.VERTICAL, false)
-            salesOrderDocLinesAdapter  = SalesOrderDocumentLinesItemAdapter { qtyList ->
+            salesOrderDocLinesAdapter = SalesOrderDocumentLinesItemAdapter { qtyList ->
                 createSaleToDelivery(saleOrderValue!!, qtyList)
             }
             adapter = salesOrderDocLinesAdapter
@@ -168,140 +188,142 @@ class SalesOrderDocumentLinesActivity : AppCompatActivity() {
 
     @SuppressLint("NewApi")
     private fun createSaleToDelivery(saleOrderValue: SaleOrdersModel.Value, list: ArrayList<SaleOrdersModel.Value.DocumentLine>) {
-if(networkConnection.getConnectivityStatusBoolean(applicationContext)){
+        if (networkConnection.getConnectivityStatusBoolean(applicationContext)) {
 
-    val currentDate = LocalDateTime.now()
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-    val formattedDate = currentDate.format(formatter)
-    var postedJson = JsonObject()
-    postedJson.addProperty("Series", saleOrderValue.SeriesDel?.toIntOrNull() ?: 0)//594 for delivery
-    postedJson.addProperty("DocDate", formattedDate)
-    postedJson.addProperty("DocDueDate", saleOrderValue.DocDueDate)
-    postedJson.addProperty("TaxDate", saleOrderValue.TaxDate)
-    postedJson.addProperty("CardCode", saleOrderValue.CardCode)
-    postedJson.addProperty("BPL_IDAssignedToInvoice", saleOrderValue.BPLID)
-    postedJson.addProperty("NumAtCard", "Test")  //saleOrderValue.NumAtCard
-    postedJson.addProperty("Comments", "")  // added by Vinod @28Apr,2025
-    postedJson.addProperty("DocType", "dDocument_Items")  //saleOrderValue.NumAtCard
-    postedJson.addProperty("U_Type", "SO")
-    postedJson.addProperty("PayToCode", saleOrderValue.PayToCode)
-    postedJson.addProperty("ShipToCode", saleOrderValue.ShipToCode)
-    postedJson.addProperty("U_WMSUSER", sessionManagement.getLoginId(this@SalesOrderDocumentLinesActivity))
-    postedJson.addProperty("U_Scanned", "Y")
+            val currentDate = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+            val formattedDate = currentDate.format(formatter)
+            var postedJson = JsonObject()
+            postedJson.addProperty("Series", saleOrderValue.SeriesDel?.toIntOrNull() ?: 0)//594 for delivery
+            postedJson.addProperty("DocDate", formattedDate)
+            postedJson.addProperty("DocDueDate", saleOrderValue.DocDueDate)
+            postedJson.addProperty("TaxDate", saleOrderValue.TaxDate)
+            postedJson.addProperty("CardCode", saleOrderValue.CardCode)
+            postedJson.addProperty("BPL_IDAssignedToInvoice", saleOrderValue.BPLID)
+            postedJson.addProperty("NumAtCard", saleOrderValue.NumAtCard ?: "")  //saleOrderValue.NumAtCard
+            postedJson.addProperty("Comments", "")  // added by Vinod @28Apr,2025
+            postedJson.addProperty("DocType", "dDocument_Items")  //saleOrderValue.NumAtCard
+            postedJson.addProperty("U_Type", "SO")
+            postedJson.addProperty("PayToCode", saleOrderValue.PayToCode)
+            postedJson.addProperty("ShipToCode", saleOrderValue.ShipToCode)
+            postedJson.addProperty("U_WMSUSER", sessionManagement.getLoginId(this@SalesOrderDocumentLinesActivity))
+            postedJson.addProperty("U_Scanned", "Y")
 
-    var StockTransferLines = JsonArray()
+            var StockTransferLines = JsonArray()
 
 
-    for (i in list.indices) {
+            for (i in list.indices) {
 
-        val jsonObject = JsonObject()
-        jsonObject.addProperty("BaseEntry", list[i].DocEntry)
-        jsonObject.addProperty("LineNum", list[i].LineNum)
-        //jsonObject.addProperty("Price", list[i].Price)
-        jsonObject.addProperty("Quantity", list[i].totalPktQty)
-        //jsonObject.addProperty("UnitPrice", list[i].UnitPrice)
-        jsonObject.addProperty("U_ACT_QTY", list[i].U_ACT_QTY)
-        jsonObject.addProperty("U_BOX_QTY", list[i].isScanned)
-        jsonObject.addProperty("ItemCode", list[i].ItemCode)
-        jsonObject.addProperty("WarehouseCode", list[i].WarehouseCode)
-        jsonObject.addProperty("BaseLine", list[i].LineNum)
-        jsonObject.addProperty("BaseType", "17")
-        jsonObject.addProperty("TaxCode", list[i].TaxCode)
-        jsonObject.addProperty("U_Size", "")
-        if (list[i].isScanned > 0) {
-            StockTransferLines.add(jsonObject)
-        }
+                val jsonObject = JsonObject()
+                jsonObject.addProperty("BaseEntry", list[i].DocEntry)
+                jsonObject.addProperty("LineNum", list[i].LineNum)
+                //jsonObject.addProperty("Price", list[i].Price)
+                jsonObject.addProperty("Quantity", list[i].totalPktQty)
+                //jsonObject.addProperty("UnitPrice", list[i].UnitPrice)
+                jsonObject.addProperty("U_ACT_QTY", list[i].U_ACT_QTY)
+                jsonObject.addProperty("U_BOX_QTY", list[i].isScanned)
+                jsonObject.addProperty("ItemCode", list[i].ItemCode)
+                jsonObject.addProperty("WarehouseCode", list[i].WarehouseCode)
+                jsonObject.addProperty("BaseLine", list[i].LineNum)
+                jsonObject.addProperty("BaseType", "17")
+                jsonObject.addProperty("TaxCode", list[i].TaxCode)
+                jsonObject.addProperty("U_Size", "")
+                if (list[i].isScanned > 0) {
+                    StockTransferLines.add(jsonObject)
+                }
 
-    }
+            }
 
-    postedJson.add("DocumentLines", StockTransferLines)
+            postedJson.add("DocumentLines", StockTransferLines)
 
-    Log.e("success--PayLoad==>", "==>" + postedJson.toString())
-    val apiConfig = ApiConstantForURL()
-    NetworkClients.updateBaseUrlFromConfig(apiConfig, ApiConstantForURL.ApiType.STANDARD)
-    val networkClient = NetworkClients.create(this@SalesOrderDocumentLinesActivity)
-    networkClient.postDeliveryDocument(postedJson).apply {
-        enqueue(object : Callback<SaleToDeliveryResponse> {
-            override fun onResponse(
-                call: Call<SaleToDeliveryResponse>,
-                response: Response<SaleToDeliveryResponse>
-            ) {
-                try {
-                    binding.chipSave.isEnabled = true
-                    binding.chipSave.isCheckable = true
-
-                    AppConstants.IS_SCAN = false
-                    materialProgressDialog.dismiss()
-                    Log.e("success---BP---", "==>" + response.code())
-                    if (response.code() == 201 || response.code() == 200) {
-                        Log.e("success------", "Successful!")
-                        Log.d(
-                            "Doc_Num",
-                            "onResponse: " + response.body()!!.DocNum.toString()
-                        )
-                        GlobalMethods.showSuccess(
-                            this@SalesOrderDocumentLinesActivity,
-                            "Post Successfully. " + response.body()!!.DocNum.toString()
-                        )
-                        onBackPressed()
-                    } else {
-                        materialProgressDialog.dismiss()
-                        val gson1 = GsonBuilder().create()
-                        var mError: OtpErrorModel
+            Log.e("success--PayLoad==>", "==>" + postedJson.toString())
+            materialProgressDialog.show()
+            val apiConfig = ApiConstantForURL()
+            NetworkClients.updateBaseUrlFromConfig(apiConfig, ApiConstantForURL.ApiType.STANDARD)
+            val networkClient = NetworkClients.create(this@SalesOrderDocumentLinesActivity)
+            networkClient.postDeliveryDocument(postedJson).apply {
+                enqueue(object : Callback<SaleToDeliveryResponse> {
+                    override fun onResponse(
+                        call: Call<SaleToDeliveryResponse>,
+                        response: Response<SaleToDeliveryResponse>
+                    ) {
                         try {
-                            val s = response.errorBody()!!.string()
-                            mError = gson1.fromJson(s, OtpErrorModel::class.java)
-                            if (mError.error.code.equals(400)) {
-                                GlobalMethods.showError(
-                                    this@SalesOrderDocumentLinesActivity,
-                                    mError.error.message.value
+                            binding.chipSave.isEnabled = true
+                            binding.chipSave.isCheckable = true
+
+                            AppConstants.IS_SCAN = false
+                            materialProgressDialog.dismiss()
+                            Log.e("success---BP---", "==>" + response.code())
+                            if (response.code() == 201 || response.code() == 200) {
+                                Log.e("success------", "Successful!")
+                                Log.d(
+                                    "Doc_Num",
+                                    "onResponse: " + response.body()!!.DocNum.toString()
                                 )
-                            }
-                            if (mError.error.message.value != null) {
-                                GlobalMethods.showError(
+                                GlobalMethods.showSuccess(
                                     this@SalesOrderDocumentLinesActivity,
-                                    mError.error.message.value
+                                    "Post Successfully. " + response.body()!!.DocNum.toString()
                                 )
-                                Log.e("json_error------", mError.error.message.value)
+                                onBackPressed()
+                            } else {
+                                materialProgressDialog.dismiss()
+                                val gson1 = GsonBuilder().create()
+                                var mError: OtpErrorModel
+                                try {
+                                    val s = response.errorBody()!!.string()
+                                    mError = gson1.fromJson(s, OtpErrorModel::class.java)
+                                    if (mError.error.code.equals(400)) {
+                                        GlobalMethods.showError(
+                                            this@SalesOrderDocumentLinesActivity,
+                                            mError.error.message.value
+                                        )
+                                    }
+                                    if (mError.error.message.value != null) {
+                                        GlobalMethods.showError(
+                                            this@SalesOrderDocumentLinesActivity,
+                                            mError.error.message.value
+                                        )
+                                        Log.e("json_error------", mError.error.message.value)
+                                    }
+                                } catch (e: IOException) {
+                                    e.printStackTrace()
+                                }
+
                             }
-                        } catch (e: IOException) {
+                        } catch (e: Exception) {
+                            binding.chipSave.isEnabled = true
+                            binding.chipSave.isCheckable = true
+                            materialProgressDialog.dismiss()
                             e.printStackTrace()
+                            Log.e("catch---------", e.toString())
                         }
 
                     }
-                } catch (e: Exception) {
-                    binding.chipSave.isEnabled = true
-                    binding.chipSave.isCheckable = true
-                    materialProgressDialog.dismiss()
-                    e.printStackTrace()
-                    Log.e("catch---------", e.toString())
-                }
 
+                    override fun onFailure(call: Call<SaleToDeliveryResponse>, t: Throwable) {
+                        binding.chipSave.isEnabled = true
+                        binding.chipSave.isCheckable = true
+                        if (t.message == "VPN_Exception") {
+                            GlobalMethods.showError(
+                                this@SalesOrderDocumentLinesActivity, "VPN is not connected. Please connect VPN and try again."
+                            )
+                        } else {
+                            GlobalMethods.showError(this@SalesOrderDocumentLinesActivity, t.message ?: "")
+                        }
+                        Log.e("orderLines_failure-----", t.toString())
+                        materialProgressDialog.dismiss()
+                    }
+
+                })
             }
-
-            override fun onFailure(call: Call<SaleToDeliveryResponse>, t: Throwable) {
-                binding.chipSave.isEnabled = true
-                binding.chipSave.isCheckable = true
-                if (t.message == "VPN_Exception") {
-                    GlobalMethods.showError(this@SalesOrderDocumentLinesActivity,"VPN is not connected. Please connect VPN and try again."
-                    )
-                }else{
-                    GlobalMethods.showError(this@SalesOrderDocumentLinesActivity, t.message ?: "")
-                }
-                Log.e("orderLines_failure-----", t.toString())
-                materialProgressDialog.dismiss()
-            }
-
-        })
-    }
-}else {
-    materialProgressDialog.dismiss()
-        Toast.makeText(
-            this@SalesOrderDocumentLinesActivity,
-            "No Network Connection",
-            Toast.LENGTH_SHORT
-        ).show()
-}
+        } else {
+            materialProgressDialog.dismiss()
+            Toast.makeText(
+                this@SalesOrderDocumentLinesActivity,
+                "No Network Connection",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
 
 
     }

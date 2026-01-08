@@ -1,6 +1,7 @@
 package com.soothe.sapApplication.ui.inventoryTransferRequest.activity
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -16,6 +17,7 @@ import com.soothe.sapApplication.Global_Classes.GlobalMethods
 import com.soothe.sapApplication.Global_Classes.MaterialProgressDialog
 import com.soothe.sapApplication.Global_Notification.NetworkConnection
 import com.soothe.sapApplication.Model.OtpErrorModel
+import com.soothe.sapApplication.R
 import com.soothe.sapApplication.Retrofit_Api.ApiConstantForURL
 import com.soothe.sapApplication.Retrofit_Api.NetworkClients
 import com.soothe.sapApplication.SessionManagement.SessionManagement
@@ -33,7 +35,7 @@ import java.time.format.DateTimeFormatter
 
 class InventoryRequestLinesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInventoryRequestLinesBinding
-
+    private lateinit var mediaPlayer: MediaPlayer
     private lateinit var productionOrderLinesList: ArrayList<InventoryRequestModel.StockTransferLines>
     private var inventoryItem: InventoryRequestModel.Value? = null
 
@@ -134,7 +136,7 @@ class InventoryRequestLinesActivity : AppCompatActivity() {
                     val res = response.body()!!.value[0]
 
                     Log.i("NAV_CODE_SCANNING", "Scanning Data: $res")
-
+                    playSound()
                     inventoryTransferItemAdapter.updateScannedItem(
                         itemCode = res.ItemCode,
                         packQty = res.U_PACK_QTY.toInt(),
@@ -147,13 +149,29 @@ class InventoryRequestLinesActivity : AppCompatActivity() {
                 override fun onFailure(call: Call<NavScanResModel>, t: Throwable) {
                     materialProgressDialog.dismiss()
                     if (t.message == "VPN_Exception") {
-                        GlobalMethods.showError(this@InventoryRequestLinesActivity,"VPN is not connected. Please connect VPN and try again."
+                        GlobalMethods.showError(
+                            this@InventoryRequestLinesActivity, "VPN is not connected. Please connect VPN and try again."
                         )
-                    }else{
+                    } else {
                         GlobalMethods.showError(this@InventoryRequestLinesActivity, t.message ?: "")
                     }
                 }
             })
+    }
+
+    private fun playSound() {
+        if (::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
+        }
+        mediaPlayer = MediaPlayer.create(this, R.raw.boxx_added)
+        mediaPlayer.start()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
+        }
     }
 
     private fun setLinesItemAdapter() {
@@ -192,7 +210,7 @@ class InventoryRequestLinesActivity : AppCompatActivity() {
 
 
         if (networkConnection.getConnectivityStatusBoolean(applicationContext)) {
-            materialProgressDialog.show()
+
 
             var StockTransferLines = JsonArray()
 
@@ -231,7 +249,7 @@ class InventoryRequestLinesActivity : AppCompatActivity() {
 
             if (false)
                 return
-
+            materialProgressDialog.show()
             val networkClient = NetworkClients.create(this@InventoryRequestLinesActivity)
             networkClient.dostockTransfer(postedJson).apply {
                 enqueue(object : Callback<InventoryPostResponse> {
@@ -289,9 +307,10 @@ class InventoryRequestLinesActivity : AppCompatActivity() {
                         binding.chipSave.isEnabled = true
                         binding.chipSave.isCheckable = true
                         if (t.message == "VPN_Exception") {
-                            GlobalMethods.showError(this@InventoryRequestLinesActivity,"VPN is not connected. Please connect VPN and try again."
+                            GlobalMethods.showError(
+                                this@InventoryRequestLinesActivity, "VPN is not connected. Please connect VPN and try again."
                             )
-                        }else{
+                        } else {
                             GlobalMethods.showError(this@InventoryRequestLinesActivity, t.message ?: "")
                         }
                         Log.e("orderLines_failure-----", t.toString())

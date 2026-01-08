@@ -90,7 +90,10 @@ class SalesOrderDocumentLinesItemAdapter(private val onSave: (
 
         val item = newList[index]
 
-        if (item.totalPktQty >= toWholeInt(item.RemainingQuantity.toString())) return
+        if (item.totalPktQty >= toWholeInt(item.RemainingQuantity.toString())) {
+            GlobalMethods.showError(MyApp.currentApp, "Scanning completed for this Item.")
+            return
+        }
 
         val newScanCount = item.isScanned + 1
 
